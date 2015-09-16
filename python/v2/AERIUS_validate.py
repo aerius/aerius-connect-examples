@@ -8,6 +8,7 @@ import getopt
 import websocket
 
 AERIUS_SERVER = "connect.aerius.nl"
+debug = False
 
 """
 Open the file, create json object send this json to AERIUS connect endpoint
@@ -46,6 +47,11 @@ def gml_convert(inputfile):
         ws.send(json.dumps(json_data))
         result = ws.recv()
         ws.close()
+        if debug:
+            print ("DEBUG json data send:")
+            print (json.dumps(json_data))
+            print ("DEBUG json data recieved:")
+            print (result)
         # write result part
         if result.find("successful") > -1:
             json_output = json.loads(result)
@@ -69,13 +75,17 @@ def gml_convert(inputfile):
     return
     
 def main(argv):
-    opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+    opts, args = getopt.getopt(argv,"hdi:o:",["ifile=","ofile="])
     for opt, arg in opts:
         if opt == '-h':
-            print('AERIUS_validate.py -i <gml file>')
+            print('AERIUS_validate.py [-d] -i <gml file>')
             sys.exit()
+        elif opt == '-d':
+            global debug
+            debug = True
         elif opt in ("-i", "--ifile"):
             inputfile = arg
+
     print("reading ", inputfile)
     gml_convert(inputfile)
 
