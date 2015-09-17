@@ -33,10 +33,10 @@ def gml_calculateAndEmail(inputfile,comparefile):
 			"email":"aeriusmail+connect@gmail.com",
 			"options":{
 				"calculationType":"NBWET",
-				"year":2020,
+				"year":2015,
 				"substances":["NOX","NH3"],
 				"maximumRange":10000,
-				"tempProject":0,
+				"tempProject":false,
 				"tempProjectYears":1
 			},
 			"data":[{
@@ -56,7 +56,7 @@ def gml_calculateAndEmail(inputfile,comparefile):
         json_data["params"]["data"].append(row)
         json_data["params"]["data"][1]["data"] = compare
 	
-    print(json.dumps(json_data))
+    #print(json.dumps(json_data))
 	
     try:
         ws = websocket.create_connection("ws://" + AERIUS_SERVER + "/connect/2/services")
