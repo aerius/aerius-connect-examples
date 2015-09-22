@@ -19,6 +19,7 @@ import getopt
 import websocket
 
 AERIUS_SERVER = "ws://connect.aerius.nl"
+AERIUS_PATH = "/connect/1/services"
 debug = False
 
 def calculate(inputfile):
@@ -55,7 +56,7 @@ def calculate(inputfile):
 	#print(json.dumps(json_data))
 
 	try:
-		ws = websocket.create_connection(AERIUS_SERVER + "/connect/2/services")
+		ws = websocket.create_connection(AERIUS_SERVER + AERIUS_PATH)
 	except Exception as e:
 		print ("Unexpected connection error:", e)
 		return
@@ -83,7 +84,7 @@ def calculate(inputfile):
 					print (error["errorCode"] + " - " + error["description"])
 			else:
 				print ("gml calculation added to the queue")
-		else: 
+		else:
 			# we have JSON-RPC error
 			json_output = json.loads(result)
 			error = json_output["error"]
@@ -97,19 +98,44 @@ def calculate(inputfile):
 
 	return
 
+def usage(errorlevel=0):
+	# Neat helptext to display by user request or in case of errors
+	print('Usage: ',__file__,' [-d] -i <gml file>\n')
+	print('-d   - Run in debug mode')
+	print('-i   - Specify inputfile -i <gml file> or --ifile=<gml file>')
+	print('-h   - Show this help text')
+	sys.exit(errorlevel)
+	
 def main(argv):
-	opts, args = getopt.getopt(argv,"hdi:e:",["ifile="])
+	# Initialize inputfile here to prevent unassigned variable errors later on
+	inputfile = ""
+
+	# Try parsing arguments and catch any exceptions that getopt can throw at us
+	try:
+		opts, args = getopt.getopt(argv,"hdi:e:",["help","debug","ifile="])
+	except getopt.GetoptError as err:
+		print(err)
+		usage(2)
+
+	# We expect at least 1 option so let's check for one
+	if not opts:
+		print("At least 1 option is required to run")
+		usage()
+
 	for opt, arg in opts:
-		if opt == '-h':
-			print('AERIUS_calculate.py [-d] -i <gml file>')
-			sys.exit()
-		elif opt == '-d':
+		if opt in ("-h", "--help"):
+			usage()
+		elif opt in ("-d", "--debug"):
 			global debug
 			debug = True
 		elif opt in ("-i", "--ifile"):
 			inputfile = arg
-
-	print("reading ", inputfile)
+			# If still empty here no inputfile was specified
+			if not inputfile:
+				print("No input file specified!")
+				usage()
+			else :
+				print("Reading ", inputfile)
 
 	calculate(inputfile)
 
