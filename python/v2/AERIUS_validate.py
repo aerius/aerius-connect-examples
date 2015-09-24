@@ -58,7 +58,7 @@ def convert2GML(inputfile):
 			json_output = json.loads(result)
 			if (result.find("errors") > -1):
 				for error in json_output["result"]["errors"]:
-					print (error["errorCode"] + " - " + error["description"])
+					print ("error: " + str(error["code"]) + " - " + error["message"])
 			else:
 				print ("gml validated correctly!")
 		else: 
