@@ -19,7 +19,7 @@ import getopt
 import websocket
 
 AERIUS_SERVER = "ws://connect.aerius.nl"
-AERIUS_PATH = "/connect/1/services"
+AERIUS_PATH = "/connect/2/services"
 debug = False
 
 
