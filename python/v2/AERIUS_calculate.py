@@ -12,21 +12,24 @@ als een echte json-rpc methode. Dit voorbeeld print alleen de ontvangen data van
 """
 import json
 import time
-# import os
-# import pprint
 import sys
 import getopt
 import websocket
 
-AERIUS_SERVER = "ws://connect.aerius.nl"
+# AERIUS_SERVER = "ws://connect.aerius.nl"
+AERIUS_SERVER = "ws://192.168.1.17:6060"
 AERIUS_PATH = "/connect/2/services"
 debug = False
+DUMPFILE_JSON_REQUEST = "dump_json_request.log"
+DUMPFILE_JSON_RESULTS = "dump_json_resultx.log"
 
 
 def calculate(inputfile):
+    # Open and read content of the input file
     f = open(inputfile, 'r')
     data = f.read()
     f.close()
+
     # create json text object
     json_text = """
     {
@@ -51,61 +54,66 @@ def calculate(inputfile):
     json_data = json.loads(json_text)
     json_data["id"] = int(time.time() * 1000)  # create unique id
     json_data["params"]["data"][0]["data"] = data
-    print(json_text)
-
-    # print(json.dumps(json_data))
 
     try:
         ws = websocket.create_connection(AERIUS_SERVER + AERIUS_PATH)
     except Exception as e:
-        print ("Unexpected connection error:", e)
+        print("Unexpected connection error:", e)
         return
 
     try:
-        result = ""
-        # sending data
+        # Initialize result variables and send the prepared JSON request
+        received_data = ""
         ws.send(json.dumps(json_data))
         while True:
             result = ws.recv()
             if not result:
-                print ("nothing")
+                print("## Received nothing!?")
             else:
-                print (json.loads(result))
-        ws.close()
+                if debug:
+                    # Gather all responses received so we can dump them to a file
+                    received_data += str(json.loads(result)) + "\n"
+                if "'successful': True" in result:
+                    print("## Received confirmation from server: started processing data")
+                if "callback.onResults" in result:
+                    print("## Received (partial) result")
+                # Check result and break out of the loop if any errors occurred
+                if "error" in result:
+                    # print("Received errors from server:", str(result))
+                    json_output = json.loads(result)
+                    for error in json_output["result"]["errors"]:
+                        print("error: " + str(error["code"]) + " - " + str(error["message"]))
+                    break
+                # Break out of the loop when the onFinish event is received
+                if "callback.onFinish" in result:
+                    print("## Received confirmation from server: finished processing data")
+                    break
         if debug:
-            print ("(DEBUG json data send:)")
-            print (json.dumps(json_data))
-            print ("(DEBUG json data recieved:)")
-            print (result)
-        # write result part
-        if result.find("successful") > -1:
-            json_output = json.loads(result)
-            if result.find("errors") > -1:
-                for error in json_output["result"]["errors"]:
-                    print (error["errorCode"] + " - " + error["description"])
-            else:
-                print ("gml calculation added to the queue")
-        else:
-            # we have JSON-RPC error
-            json_output = json.loads(result)
-            error = json_output["error"]
-            print ("error: " + str(error["code"]) + " - " + error["message"])
-
-    except Exception as e:
-        print ("Unexpected result error:", e)
-
+            # When the debug (-d) option is set we dump sent and received data to files for further inspection
+            with open(DUMPFILE_JSON_REQUEST, "w") as file:
+                file.write(str(json.dumps(json_data)))
+                print("DEBUG json request written to file: ", file.name)
+                file.close()
+            with open(DUMPFILE_JSON_RESULTS, "w") as file:
+                file.write(received_data)
+                print("DEBUG json results written to file: ", file.name)
+                file.close()
+    except IOError as e:
+        print("Unexpected result error:", str(e))
+    except Exception:
+        print("Unexpected result error:", sys.exc_info()[:3])
     finally:
         ws.close()
-
     return
 
 
 def usage(errorlevel=0):
-    # Neat helptext to display by user request or in case of errors
-    print "Usage: ", __file__, " [-d] -i <gml file>\n"
-    print "-d   - Run in debug mode"
-    print "-i   - Specify input file -i <gml file> or --ifile=<gml file>"
-    print "-h   - Show this help text"
+    # Neat help text to display by user request or in case of errors
+    print("Usage: ", __file__, " [-d] -i <gml file>")
+    print()
+    print("-d , --debug  : Run in debug mode")
+    print("-i , --ifile  : Specify input file -i <gml file> or --ifile=<gml file>")
+    print("-h , --help   : Show this help text")
     sys.exit(errorlevel)
 
 
@@ -141,6 +149,7 @@ def main(argv):
     else:
         print("Reading ", inputfile)
 
+    # If all prerequisites are satisfied we can start the actual calculation
     calculate(inputfile)
 
 
