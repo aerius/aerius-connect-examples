@@ -3,5 +3,5 @@ Dit project bevat een aantal programmeer voorbeelden voor het gebruik van AERIUS
 Op dit moment zijn er voorbeelden in de volgende programmeertalen:
 
 #### python:
-- python 2 of 3.
+- python 3.
 - module websocket-client: <code>pip install websocket-client</code>
