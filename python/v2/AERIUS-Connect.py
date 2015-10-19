@@ -37,9 +37,9 @@ JSON_BASE = """
 """
 
 
-def debug(*args, sep=' ', end='\n', file=None):
+def debug(args):
     if DEBUG_ENABLED:
-        print("DEBUG:", sep.join(args), sep=sep, end=end, file=file)
+        print("DEBUG:" + args)
 
 
 def get_json(method, params):
@@ -142,7 +142,7 @@ def call_connect(json_data, outputfile=None):
     try:
         debug("Trying to send data to service..")
         if DEBUG_ENABLED:
-            debug("Writing input data send to service to:", DEBUG_INPUT_FILE)
+            debug("Writing input data send to service to:" + DEBUG_INPUT_FILE)
             fileout = open(DEBUG_INPUT_FILE, "w+")
             fileout.write(json.dumps(json_data))
 
@@ -152,7 +152,7 @@ def call_connect(json_data, outputfile=None):
         debug("Done receiving!")
 
         if DEBUG_ENABLED:
-            debug("Writing full result from service to:", DEBUG_RESULT_FILE)
+            debug("Writing full result from service to:" + DEBUG_RESULT_FILE)
             fileout = open(DEBUG_RESULT_FILE, "w+")
             fileout.write(str(result))
 
@@ -188,9 +188,9 @@ def usage(errormessage=None):
     print()
     print()
     print("Actions:")
-    print("- " + COMMAND_VALIDATE + ":", "Validate the GML file", sep='\t\t')
-    print("- " + COMMAND_CONVERT + ":", "Convert GML file to the latest version", sep='\t\t')
-    print("- " + COMMAND_CALCULATEANDEMAIL + ":", "Import and calculate the GML and email the results", sep='\t')
+    print("- " + COMMAND_VALIDATE + ":", '\t\t', "Validate the GML file")
+    print("- " + COMMAND_CONVERT + ":", '\t\t', "Convert GML file to the latest version")
+    print("- " + COMMAND_CALCULATEANDEMAIL + ":", '\t', "Import and calculate the GML and email the results")
 
     if errormessage:
         sys.exit(1)
