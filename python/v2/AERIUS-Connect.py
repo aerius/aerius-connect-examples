@@ -19,8 +19,9 @@ CONNECT_SERVICE_FULL = CONNECT_HOST + CONNECT_SERVICE_URL
 COMMAND_VALIDATE = "validate"
 COMMAND_CONVERT = "convert"
 COMMAND_CALCULATEANDEMAIL = "calculateAndEmail"
+COMMAND_CALCULATEREPORTANDEMAIL = "calculateReportAndEmail"
 
-ALL_COMMANDS = [COMMAND_VALIDATE, COMMAND_CONVERT, COMMAND_CALCULATEANDEMAIL]
+ALL_COMMANDS = [COMMAND_VALIDATE, COMMAND_CONVERT, COMMAND_CALCULATEANDEMAIL, COMMAND_CALCULATEREPORTANDEMAIL]
 
 # JSON BASE will we will fill based on the action chosen
 JSON_BASE = """
@@ -93,6 +94,29 @@ def service_calculate_and_email(inputgml, emailaddress):
                 ]
             },
             "data": [{
+                "dataType": "GML",
+                "contentType": "TEXT",
+                "data": inputgml
+            }]
+        }
+    )
+
+    call_connect(json_data)
+
+def service_calculate_report_and_email(inputgml, emailaddress):
+    json_data = get_json(
+        'report.calculateReportAndEmail',
+        {
+            "email": emailaddress,
+            "options": {
+                "calculationType": "NBWET",
+                "year": 2015,
+                "substances": [
+                    "NOX",
+                    "NH3"
+                ]
+            },
+            "proposed": [{
                 "dataType": "GML",
                 "contentType": "TEXT",
                 "data": inputgml
@@ -179,6 +203,7 @@ def usage(errormessage=None):
     print("\t", os.path.basename(__file__), "[-d] " + COMMAND_VALIDATE + " <input GML file>")
     print("\t", os.path.basename(__file__), "[-d] " + COMMAND_CONVERT + " <input GML file> <output GML file>")
     print("\t", os.path.basename(__file__), "[-d] " + COMMAND_CALCULATEANDEMAIL + " <input GML file> <email address>")
+    print("\t", os.path.basename(__file__), "[-d] " + COMMAND_CALCULATEREPORTANDEMAIL + " <input GML file> <email address>")
     print()
     print()
     print("-d, --debug")
@@ -191,6 +216,7 @@ def usage(errormessage=None):
     print("- " + COMMAND_VALIDATE + ":", '\t\t', "Validate the GML file")
     print("- " + COMMAND_CONVERT + ":", '\t\t', "Convert GML file to the latest version")
     print("- " + COMMAND_CALCULATEANDEMAIL + ":", '\t', "Import and calculate the GML and email the results")
+    print("- " + COMMAND_CALCULATEREPORTANDEMAIL + ":", '\t', "Import and produce a license PDF and email the results")
 
     if errormessage:
         sys.exit(1)
@@ -236,7 +262,10 @@ def main(argv):
         elif command_to_execute == COMMAND_CALCULATEANDEMAIL:
             needs_email_address = True
             amount_of_args_expected = 3
-
+        elif command_to_execute == COMMAND_CALCULATEREPORTANDEMAIL:
+            needs_email_address = True
+            amount_of_args_expected = 3
+			
         if len(remainder) != amount_of_args_expected:
             usage("Unexpected amount of args received")
 
@@ -253,7 +282,9 @@ def main(argv):
             service_validate(inputgml)
         elif command_to_execute == COMMAND_CALCULATEANDEMAIL:
             service_calculate_and_email(inputgml, email_address)
-
+        elif command_to_execute == COMMAND_CALCULATEREPORTANDEMAIL:
+            service_calculate_report_and_email(inputgml, email_address)
+			
     else:
         usage("No command specified")
 
