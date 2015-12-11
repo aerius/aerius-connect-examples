@@ -216,7 +216,7 @@ def usage(errormessage=None):
     print("- " + COMMAND_VALIDATE + ":", '\t\t', "Validate the GML file")
     print("- " + COMMAND_CONVERT + ":", '\t\t', "Convert GML file to the latest version")
     print("- " + COMMAND_CALCULATEANDEMAIL + ":", '\t', "Import and calculate the GML and email the results")
-    print("- " + COMMAND_CALCULATEREPORTANDEMAIL + ":", '\t', "Import and produce a license PDF and email the results")
+    print("- " + COMMAND_CALCULATEREPORTANDEMAIL + ":", '\t', "Import and produce a NBWET PDF and email the results")
 
     if errormessage:
         sys.exit(1)
