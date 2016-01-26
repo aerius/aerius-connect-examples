@@ -87,7 +87,7 @@ def service_calculate_and_email(inputgml, emailaddress):
             "email": emailaddress,
             "options": {
                 "calculationType": "NBWET",
-                "year": 2015,
+                "year": 2016,
                 "substances": [
                     "NOX",
                     "NH3"
@@ -110,7 +110,7 @@ def service_calculate_report_and_email(inputgml, emailaddress):
             "email": emailaddress,
             "options": {
                 "calculationType": "NBWET",
-                "year": 2015,
+                "year": 2016,
                 "substances": [
                     "NOX",
                     "NH3"
