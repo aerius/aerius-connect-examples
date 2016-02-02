@@ -135,6 +135,10 @@ def process_results(json_data):
             for error in json_output["result"]["errors"]:
                 print('ERROR:', error["code"], "-", error["message"])
                 sys.exit(1)
+        elif json_data.find("warnings") > -1 and len(json_output["result"]["warnings"]) > 0:	
+            print("Call succeeded without errors, but with following warnings:")
+            for warning in json_output["result"]["warnings"]:
+                print('WARNING:', warning["code"], "-", warning["message"])
         else:
             print("Call succeeded without errors")
     else:
