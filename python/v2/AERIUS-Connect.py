@@ -195,7 +195,7 @@ def call_connect(json_data, outputfile=None):
     if json_output and outputfile:
         print("Writing content to:", outputfile)
         fileout = open(outputfile, "w+")
-        fileout.write(json_output["result"]["data"])
+        fileout.write(json_output["result"]["data"].encode('utf8'))
 
 
 def usage(errormessage=None):
