@@ -2,14 +2,18 @@
 """
 Dit script is bedoeld als voorbeeld om het gebruik van AERIUS connect te demonstreren.
 """
+from __future__ import print_function  # Consistent print methods across various Python versions
+from __future__ import unicode_literals  # Unicode literal fixes
+
 import base64
 import binascii
 import datetime
 import getopt
 import json
-import time
-import sys
+import numbers
 import os
+import sys
+import time
 import websocket
 
 if not hasattr(websocket, 'create_connection'):
@@ -249,8 +253,9 @@ def call_connect(json_data, outputfile=None):
 
 
 def pretty_format_unixtime(value):
-    if isinstance(value, int):
+    if isinstance(value, numbers.Number):
         return datetime.datetime.fromtimestamp(value / 1000).strftime('%Y-%m-%d %H:%M:%S')
+
     return value
 
 
@@ -321,7 +326,7 @@ def main(argv):
         amount_of_args_expected = 0
 
         # Check if the command given is valid
-        if not any(x == command_to_execute for x in ALL_COMMANDS):
+        if not command_to_execute in ALL_COMMANDS:
             usage("Command not recognized")
 
         # Let's determine which and how much arguments we expect, default is specified above
