@@ -1,0 +1,6 @@
+# AERIUS test files
+*.gml
+*.zip
+
+# Script debug output
+debug.*.txt
